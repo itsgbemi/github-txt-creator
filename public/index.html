@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GitHub TXT Creator</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 20px auto; padding: 20px; }
+    input, textarea { width: 100%; padding: 8px; margin: 8px 0; }
+    button { background: #24292e; color: white; padding: 10px; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Create a TXT File in GitHub</h1>
+  <form id="fileForm">
+    <input type="text" id="repo" placeholder="your-username/repo-name" required>
+    <input type="text" id="filename" placeholder="file.txt (or path/to/file.txt)" required>
+    <textarea id="content" rows="5" placeholder="File content..." required></textarea>
+    <button type="submit">Create File</button>
+  </form>
+  <p id="result"></p>
+
+  <script>
+    document.getElementById('fileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const repo = document.getElementById('repo').value;
+      const filename = document.getElementById('filename').value;
+      const content = document.getElementById('content').value;
+
+      try {
+        const response = await fetch('/api/create-file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repo, filename, content }),
+        });
+        const result = await response.json();
+        document.getElementById('result').innerHTML = 
+          response.ok ? `✅ File created: <a href="https://github.com/${repo}/blob/main/${filename}" target="_blank">View on GitHub</a>` 
+                      : `❌ Error: ${result.error || 'Failed to create file'}`;
+      } catch (error) {
+        document.getElementById('result').innerHTML = '❌ Network error';
+      }
+    });
+  </script>
+</body>
+</html>
